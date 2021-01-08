@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="lib/bootstrap.css">
+    <script src="lib/jquery.js"></script>
+</head>
+
+<body style="padding: 15px;">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">图书管理</h3>
+        </div>
+        <div class="panel-body form-inline">
+
+            <div class="input-group">
+                <div class="input-group-addon">书名</div>
+                <input type="text" class="form-control" id="iptBookname" placeholder="请输入书名">
+            </div>
+            <div class="input-group">
+                <div class="input-group-addon">作者</div>
+                <input type="text" class="form-control" id="iptAuthor" placeholder="请输入作者">
+            </div>
+            <div class="input-group">
+                <div class="input-group-addon">出版社</div>
+                <input type="text" class="form-control" id="iptPublisher" placeholder="请输入出版社">
+            </div>
+
+            <button class="btn btn-primary" id="btnAdd">添加</button>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>书名</th>
+                <th>作者</th>
+                <th>出版社</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="tb">
+
+        </tbody>
+    </table>
+
+    <script>
+        $(function () {
+            // 1. 获取图书列表
+            
+            function getBookList() {
+                $.get('http://www.liulongbin.top:3006/api/getbooks', function (res) {
+                    // 2. 如果有错，就提示错误，并且后续代码不再执行
+                    if (res.status !== 200) return alert('失败');
+                    console.log(111);
+                    const arr = [];
+                    // 3. 把所有数据拼接成 tr，一个一个的装进 arr 里面
+                    $.each(res.data, (index, item) => {
+                        arr.push(`
+                        <tr>
+                            <td>${item.id}</td>
+                            <td>${item.bookname}</td>
+                            <td>${item.author}</td>
+                            <td>${item.publisher}</td>
+                            <td>
+                                <a class="del" data-id="${item.id}" href="javascript:;">删除</a>
+                            </td>
+                        </tr>
+                    `);
+                    });
+                    // 4. 把数组转成字符串往 tbody 里面进行 append
+                    $('#tb').empty().append(arr.join(''));
+                });
+            }
+
+            // 事件委托：性能高、对后续新增的元素同样具有事件绑定的的效果
+            $('#tb').on('click', '.del', function () {
+                // 1. 先找到当前行的 ID
+                // let id = $(this).attr('data-id');
+                let id = $(this).data('id');
+                // console.log(id);
+
+                // 2. 再通过接口通知后端去删除
+                $.get('http://www.liulongbin.top:3006/api/delbook', { id }, function (res) {
+                    if (res.status !== 200) return alert('失败');
+                    // 3. 重新获取数据并渲染
+                    getBookList();
+                });
+            });
+
+
+            getBookList();
+
+            $('#btnAdd').on('click', function () {
+                // 1. 获取 input 框中的内容
+                let bookname = $('#iptBookname').val().trim();
+                let author = $('#iptAuthor').val().trim();
+                let publisher = $('#iptPublisher').val().trim();
+                // 2. 如果有任意一个等于0，直接打回去，并且给一个错误提示
+                if (bookname.length === 0 || author.length === 0 || publisher.length === 0) {
+                    return alert('请填写完整的图书信息！')
+                }
+                // 3. 真正的添加操作
+                $.post('http://www.liulongbin.top:3006/api/addbook', {
+                    bookname,
+                    author,
+                    publisher
+                }, function (res) {
+                    if (res.status !== 201) return alert('添加图书失败！')
+                    // 代码走到这里，确实后端的数据库里面添加成功了
+                    // 但是前端还要重新【获取数据】并【渲染】才能在页面上看到添加的结果
+                    getBookList();
+
+                    $('#iptBookname').val('');
+                    $('#iptAuthor').val('');
+                    $('#iptPublisher').val('');
+                })
+            })
+        });
+
+        /*  let age = 18;
+         let obj = {
+             // age: age
+             age
+         };
+         console.log(obj); */
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/jquery.js"></script>
+</head>
+<body>
+    <button id="btn">发起不带参数的GET请求</button>
+    <script>
+        $(function () {
+            // 给按钮注册点击事件
+            $('#btn').on('click', function () {
+                // url地址
+                $.get('http://www.liulongbin.top:3006/api/getbooks', hui => {
+                    // 请求成功后的回调函数
+                    console.log(hui);
+                })
+            })
+        })
+    </script>
+</body>
+</html>

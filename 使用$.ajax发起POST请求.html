@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/jquery.js"></script>
+</head>
+<body>
+    <button id="btn">发起POST请求</button>
+    <script>
+        $(function () {
+            $('#btn').on('click', function () {
+                $.ajax({
+                    type: 'POST',//请求的方式
+                    url: 'http://www.liulongbin.top:3006/api/addbook',//请求的url地址
+                    data: {// 要提交给服务器的数据
+                        bookname: '史记',
+                        author: '司马迁',
+                        publisher: '上海图书出版社'
+                    },
+                    // success: hui => {
+                    //     console.log(hui);
+                    // }
+                    success(res) {
+                        console.log(res);
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+</html>
